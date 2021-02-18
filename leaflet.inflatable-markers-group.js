@@ -56,58 +56,6 @@
         options: L.Icon.prototype.options,
 
         /**
-         * The underlying marker added to the group, used as the inflated
-         * version of the current inflatable marker
-         * @public
-         * @type {L.Marker}
-         */
-        baseMarker: null,
-
-        /**
-         * Where the marker is displayed
-         * @private
-         * @type {L.LatLng}
-         */
-        _latlng: null,
-
-        /**
-         * The L.InflatableMarkerGroup this marker belongs to
-         * @private
-         * @type {L.InflatableMarkersGroup}
-         */
-        _group: null,
-
-        /**
-         * The set of all markers which collision with the current marker if
-         * they're both inflated
-         * @private
-         * @type {Set<L.InflatableMarker>}
-         */
-        _obstructiveMarkers: null,
-
-        /**
-         * Whether the marker is currently inflated
-         * @private
-         * @type {boolean}
-         */
-        _inflated: null,
-
-        /**
-         * Whether the marker's icon needs to be redrawn, typically after a
-         * change from inflated to deflated or vice-versa
-         * @private
-         * @type {boolean}
-         */
-        _iconNeedsUpdate: null,
-
-        /**
-         * The original Z-index attributed to this marker
-         * @private
-         * @type {integer}
-         */
-        _savedZIndexOffset: null,
-
-        /**
          * Constructs the marker.
          * @constructs L.InflatableMarker
          * @public
@@ -124,14 +72,59 @@
             this.options._inflatedIcon = this.options.icon;
             this.options.icon = this;
 
+            /**
+             * The underlying marker added to the group, used as the inflated
+             * version of the current inflatable marker
+             * @public
+             * @type {L.Marker}
+             */
             this.baseMarker = baseMarker;
-            this.addEventParent(this.baseMarker);
+
+            /**
+             * Where the marker is displayed
+             * @private
+             * @type {L.LatLng}
+             */
             this._latlng = latlng;
+
+            /**
+             * The L.InflatableMarkerGroup this marker belongs to
+             * @private
+             * @type {L.InflatableMarkersGroup}
+             */
             this._group = group;
+
+            /**
+             * The set of all markers which collision with the current marker if
+             * they're both inflated
+             * @private
+             * @type {Set<L.InflatableMarker>}
+             */
             this._obstructiveMarkers = new Set();
+
+            /**
+             * Whether the marker is currently inflated
+             * @private
+             * @type {boolean}
+             */
             this._inflated = false;
+
+            /**
+             * Whether the marker's icon needs to be redrawn, typically after a
+             * change from inflated to deflated or vice-versa
+             * @private
+             * @type {boolean}
+             */
             this._iconNeedsUpdate = true;
+
+            /**
+             * The original Z-index attributed to this marker
+             * @private
+             * @type {integer}
+             */
             this._savedZIndexOffset = this.options.zIndexOffset;
+
+            this.addEventParent(this.baseMarker);
 
             this.on("contextmenu", this.toggle, this);
         },
@@ -349,57 +342,6 @@
         },
 
         /**
-         * The underlying layer group used to handle the map layer adding and
-         * removal operations
-         * @private
-         * @type {L.FeatureGroup}
-         */
-        _featureGroup: L.featureGroup(),
-
-        /**
-         * A associative array between base Leaflet layers (the one added to
-         * this group) and the corresponding inflatable markers this group
-         * constructs.
-         *
-         * Note: this attribute is a Map but a Javascript one (i.e. an
-         * associative array), not a Leaflet Map!
-         * @private
-         * @type {Map<L.Layer, L.InflatableMarker>}
-         */
-        _markers: new Map(),
-
-        /**
-         * The boundaries of this layer group
-         * @private
-         * @type {L.LatLngBounds}
-         */
-        _bounds: null,
-
-        /**
-         * Whether this group has already been initialized and added to a map,
-         * setting it to false will force recompute all the InflatableMarker-s
-         * collisions.
-         * @private
-         * @type {boolean}
-         */
-        _alreadyDisplayed: false,
-
-        /**
-         * Whether the inflated markers should be displayed on top of deflated
-         * markers (the default) or the opposite (to make masked deflated
-         * markers prominent).
-         * @type {boolean}
-         */
-        _inflatedMarkersAbove: true,
-
-        /**
-         * Other InflatableMarkersGroup that could be added to the same map and
-         * whose member markers may collision with the current group.
-         * @type {Set<L.InflatableMarkersGroup>}
-         */
-        _otherGroups: new Set(),
-
-        /**
          * Constructs an InflatableMarkersGroup
          * @constructs {L.InflatableMarkersGroup}
          * @param {L.InflatableMarkersGroup.options} options - The configuration options
@@ -408,6 +350,57 @@
             L.Util.setOptions(this, options);
             if (!this.options.obstructionSize instanceof L.Point)
                 this.options.obstructionSize = L.point(this.options.obstructionSize);
+
+            /**
+             * The underlying layer group used to handle the map layer adding and
+             * removal operations
+             * @private
+             * @type {L.FeatureGroup}
+             */
+            this._featureGroup = L.featureGroup();
+
+            /**
+             * A associative array between base Leaflet layers (the one added to
+             * this group) and the corresponding inflatable markers this group
+             * constructs.
+             *
+             * Note: this attribute is a Map but a Javascript one (i.e. an
+             * associative array), not a Leaflet Map!
+             * @private
+             * @type {Map<L.Layer, L.InflatableMarker>}
+             */
+            this._markers = new Map();
+
+            /**
+             * The boundaries of this layer group
+             * @private
+             * @type {L.LatLngBounds}
+             */
+            this._bounds = null;
+
+            /**
+             * Whether this group has already been initialized and added to a map,
+             * setting it to false will force recompute all the InflatableMarker-s
+             * collisions.
+             * @private
+             * @type {boolean}
+             */
+            this._alreadyDisplayed = false;
+
+            /**
+             * Whether the inflated markers should be displayed on top of deflated
+             * markers (the default) or the opposite (to make masked deflated
+             * markers prominent).
+             * @type {boolean}
+             */
+            this._inflatedMarkersAbove = true;
+
+            /**
+             * Other InflatableMarkersGroup that could be added to the same map and
+             * whose member markers may collision with the current group.
+             * @type {Set<L.InflatableMarkersGroup>}
+             */
+            this._otherGroups = new Set();
 
             this._featureGroup.addEventParent(this);
         },
