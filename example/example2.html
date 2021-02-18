@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title>Leaflet.inflatable-markers-group</title>
+  <link rel="stylesheet" href="leaflet/dist/leaflet.css">
+  <script src="leaflet/dist/leaflet.js" charset="utf-8"></script>
+  <script src="leaflet.inflatable-markers-group.min.js" charset="utf-8"></script>
+  <style type='text/css'>
+    * {
+      box-sizing: border-box;
+    }
+
+    #map {
+        position: absolute;
+        top:0;
+        left: 0;
+        right: 0;
+        bottom:0;
+    }
+
+    .myIcon div {
+      border: solid black 1px;
+    }
+
+    .myIcon.deflated div {
+      height: 100%;
+      width: 100%;
+    }
+
+    .myIcon.secondary.deflated div {
+      border-radius: 100%;
+      opacity: 70%;
+    }
+
+    .myIcon.inflated {
+      /* we need to give an explicit size to the icons to find which icons
+         conflict with each other but we actually want them to be auto-sized */
+      width: auto !important;
+      height: auto !important;
+    }
+
+    .myIcon.inflated div {
+      text-align: center;
+      padding: 1px;
+    }
+
+    .myIcon.main.inflated div {
+      border-size: 2px;
+      font-size: 1.2rem;
+    }
+  </style>
+</head>
+<body>
+  <p class="help">Leaflet + multiple inflatable markers groups
+      <a class="sources" href="http://github.com/Meteo-Concept/leaflet-inflatable-markers-group/">Sources</a>
+      <a class="logo" href="https://www.meteo-concept.fr"><img src="https://www.meteo-concept.fr/public/images/logo-meteo-concept.png"/></a>
+  </p>
+  <div id="map"></div>
+
+  <script type='text/javascript'>
+    function choseColor(value) {
+          if (value < 13) {
+                return "#5BB6D1";
+          } else if (value < 14) {
+                return "#649E56";
+          } else if (value < 15) {
+                return "#DFDF00";
+          } else if (value < 16) {
+                return "#DF85DB";
+          } else {
+                return "#FF5050";
+          }
+    };
+
+    window.onload = function () {
+    const main_data = [{"lat":48.755,"lon":-3.4683,"tx":14.8},{"lat":48.505,"lon":-2.735,"tx":15.4},{"lat":48.45,"lon":-4.3833,"tx":14.8},{"lat":48.2783,"lon":-4.4383,"tx":14.9},{"lat":47.9717,"lon":-4.16,"tx":15.3},{"lat":48.5833,"lon":-2.075,"tx":15.2},{"lat":48.0683,"lon":-1.7333,"tx":16.4},{"lat":47.6517,"lon":-3.5017,"tx":15.1},{"lat":47.9017,"lon":-2.1167,"tx":17.1},{"lat":47.7617,"lon":-3.435,"tx":15.8},{"lat":47.6033,"lon":-2.7133,"tx":16.5},{"lat":48.525,"lon":-4.1467,"tx":14.6}];
+    const secondary_data = [{"lat":48.7933,"lon":-1.0367,"tx":13.7},{"lat":48.2983,"lon":-2.1417,"tx":16.4},{"lat":48.2067,"lon":-3.05,"tx":16},{"lat":48.4033,"lon":-3.1467,"tx":14.3},{"lat":48.69,"lon":-3.04,"tx":15.6},{"lat":48.5517,"lon":-3.3767,"tx":15.1},{"lat":48.165,"lon":-2.765,"tx":15.5},{"lat":48.1817,"lon":-2.41,"tx":15.8},{"lat":48.825,"lon":-3.4717,"tx":14.5},{"lat":48.335,"lon":-2.77,"tx":15},{"lat":48.265,"lon":-2.7483,"tx":14.7},{"lat":48.5617,"lon":-3.2033,"tx":15.5},{"lat":48.7417,"lon":-3.25,"tx":15.3},{"lat":48.5183,"lon":-2.42,"tx":15.4},{"lat":48.3433,"lon":-2.0083,"tx":16.4},{"lat":48.2267,"lon":-3.295,"tx":14.3},{"lat":48.6433,"lon":-2.2467,"tx":14.8},{"lat":48.5333,"lon":-2.8517,"tx":14.6},{"lat":47.9283,"lon":-3.7,"tx":15.9},{"lat":48.36,"lon":-3.8517,"tx":14.5},{"lat":48.675,"lon":-4.33,"tx":14.5},{"lat":48.2767,"lon":-3.525,"tx":15.4},{"lat":48.065,"lon":-3.825,"tx":14.9},{"lat":48.105,"lon":-3.9767,"tx":16},{"lat":48.745,"lon":-4.0117,"tx":14.4},{"lat":48.0417,"lon":-4.8667,"tx":15.4},{"lat":48.6617,"lon":-3.6917,"tx":15.2},{"lat":47.8967,"lon":-3.8117,"tx":16.2},{"lat":48.6117,"lon":-3.8233,"tx":15.4},{"lat":48.44,"lon":-4.2317,"tx":15.2},{"lat":48.5,"lon":-3.8533,"tx":15.2},{"lat":47.945,"lon":-4.1267,"tx":15.9},{"lat":48.2583,"lon":-3.835,"tx":15.7},{"lat":48.5467,"lon":-4.6633,"tx":14.9},{"lat":48.5033,"lon":-4.3267,"tx":15.2},{"lat":48.33,"lon":-4.7717,"tx":14.9},{"lat":47.875,"lon":-4.2183,"tx":17.3},{"lat":48.225,"lon":-4.09,"tx":15.9},{"lat":48.66,"lon":-4.0767,"tx":14.9},{"lat":48.39,"lon":-4.02,"tx":13.9},{"lat":48.1733,"lon":-3.7283,"tx":15.4},{"lat":48.7117,"lon":-1.8433,"tx":14.3},{"lat":48.3267,"lon":-1.5967,"tx":15.8},{"lat":48.3367,"lon":-1.2117,"tx":15.4},{"lat":48.4783,"lon":-1.1283,"tx":14.9},{"lat":47.78,"lon":-1.765,"tx":16.4},{"lat":48.64,"lon":-1.9267,"tx":15.2},{"lat":47.6917,"lon":-1.6867,"tx":16.7},{"lat":47.7367,"lon":-1.275,"tx":16.8},{"lat":48.7283,"lon":-1.17,"tx":15.8},{"lat":49.4617,"lon":-1.65,"tx":14.7},{"lat":49.05,"lon":-1.04,"tx":15.9},{"lat":48.785,"lon":-1.1033,"tx":14},{"lat":49.0467,"lon":-1.455,"tx":15.1},{"lat":49.18,"lon":-1.1383,"tx":15.3},{"lat":48.575,"lon":-1.47,"tx":15.8},{"lat":48.5633,"lon":-1.0967,"tx":15.8},{"lat":49.4033,"lon":-1.1683,"tx":15},{"lat":48.1267,"lon":-1.0283,"tx":15.9},{"lat":48.43,"lon":-1.015,"tx":15},{"lat":47.5117,"lon":-2.3817,"tx":16.4},{"lat":47.6583,"lon":-2.97,"tx":16.5},{"lat":47.8833,"lon":-2.7283,"tx":16},{"lat":47.5233,"lon":-2.485,"tx":16.2},{"lat":47.5733,"lon":-3.0683,"tx":17.2},{"lat":48.0533,"lon":-3.6033,"tx":15.6},{"lat":47.99,"lon":-3.5,"tx":16.6},{"lat":47.59,"lon":-2.89,"tx":16.7},{"lat":47.8467,"lon":-2.5533,"tx":16},{"lat":48.065,"lon":-2.285,"tx":16},{"lat":47.9183,"lon":-2.8267,"tx":16.2},{"lat":47.765,"lon":-2.3867,"tx":16.4},{"lat":47.95,"lon":-2.3967,"tx":16.1},{"lat":48.0633,"lon":-2.945,"tx":15.8},{"lat":47.6717,"lon":-2.4567,"tx":16.6},{"lat":47.69,"lon":-2.7333,"tx":17.1},{"lat":47.6833,"lon":-2.2117,"tx":16.5},{"lat":47.5117,"lon":-2.7967,"tx":16.2},{"lat":47.64,"lon":-2.62,"tx":16.8},{"lat":47.65,"lon":-2.7767,"tx":16.8}];
+    const map = L.map('map').setView([48.0, -2.5], 7);
+    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+    const main_group = L.inflatableMarkersGroup({
+        iconCreateFunction: function (icon) {
+            const chosen = icon.baseMarker;
+            const color = choseColor(chosen.myValue);
+            return L.divIcon(
+                {
+                    html: '<div style="background-color:'+color+';"></div>',
+                    iconSize: [
+                          16,
+                          16
+                        ],
+                    className: "myIcon main deflated"
+                }
+              );
+            }
+        });
+
+    main_data.forEach(function (d) {
+        const color = choseColor(d.tx);
+        const marker = L.marker([d.lat, d.lon],
+            {
+               icon: L.divIcon(
+                   {
+                       html: '<div style="background:'+color+';">' + d.tx + '</div>',
+                       iconSize:[34, 26], // this value is necessary for this plugin
+                       iconAnchor:[17, 13],
+                       className:'myIcon main inflated',
+                   }
+                )
+            },
+        );
+        marker.myValue = d.tx; // hijack the L.Layer object to pass data
+        main_group.addLayer(marker);
+    });
+
+    const secondary_group = L.inflatableMarkersGroup({
+        iconCreateFunction: function (icon) {
+            const chosen = icon.baseMarker;
+            const color = choseColor(chosen.myValue);
+            return L.divIcon(
+                {
+                    html: '<div style="background-color:'+color+';"></div>',
+                    iconSize: [
+                          12,
+                          12
+                        ],
+                    className: "myIcon secondary deflated"
+                }
+              );
+            }
+        });
+
+    secondary_data.forEach(function (d) {
+        const color = choseColor(d.tx);
+        const marker = L.marker([d.lat, d.lon],
+            {
+               icon: L.divIcon(
+                   {
+                       html: '<div style="background:'+color+';">' + d.tx + '</div>',
+                       iconSize:[28, 22], // this value is necessary for this plugin
+                       iconAnchor:[14, 8],
+                       className:'myIcon secondary inflated',
+                   }
+                )
+            },
+        );
+        marker.myValue = d.tx;
+        secondary_group.addLayer(marker);
+    });
+
+    main_group.makeAwareOfOtherGroup(secondary_group);
+    main_group.addTo(map);
+    secondary_group.addTo(map);
+  };
+  </script>
+</body>
+</html>
