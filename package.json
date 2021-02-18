@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Meteoconcept/Leaflet.inflatable-markers-group.git"
+    "url": "git+https://github.com/Meteo-Concept/Leaflet.inflatable-markers-group.git"
   },
   "keywords": [
     "Leaflet",
@@ -20,9 +20,8 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Meteoconcept/Leaflet.inflatable-markers-group/issues"
+    "url": "https://github.com/Meteo-Concept/Leaflet.inflatable-markers-group/issues"
   },
-  "homepage": "https://www.meteo-concept.fr/blog-technique/",
   "devDependencies": {
     "@babel/cli": "^7.12.16",
     "babel-core": "^6.26.3",

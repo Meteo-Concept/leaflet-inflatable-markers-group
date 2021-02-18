@@ -22,7 +22,7 @@ now.
 
 ### Manually
 
-Download the [latest release](https://github.com/Meteoconcept/leaflet-inflatable-markers-layer) and include it in your app.
+Download the [latest release](https://github.com/Meteo-Concept/leaflet-inflatable-markers-layer) and include it in your app.
 
 
 Usage
