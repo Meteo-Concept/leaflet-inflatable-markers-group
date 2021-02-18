@@ -393,6 +393,13 @@
         _inflatedMarkersAbove: true,
 
         /**
+         * Other InflatableMarkersGroup that could be added to the same map and
+         * whose member markers may collision with the current group.
+         * @type {Set<L.InflatableMarkersGroup>}
+         */
+        _otherGroups: new Set(),
+
+        /**
          * Constructs an InflatableMarkersGroup
          * @constructs {L.InflatableMarkersGroup}
          * @param {L.InflatableMarkersGroup.options} options - The configuration options
@@ -547,21 +554,46 @@
                 const marker = result.value[1];
                 const target = this._map.latLngToContainerPoint(result.value[0]._latlng);
 
-                // a pity that it's impossible to clone an iterator
-                const iterator2 = this._markers.entries();
+                const iterator2 = this._iterateOnOwnAndOtherGroupsMarkers();
                 let result2 = iterator2.next();
-                while (!result2.done && result2.value[1] != marker)
-                    result2 = iterator2.next();
-                result2 = iterator2.next();
                 while (!result2.done) {
-                    const other = this._map.latLngToContainerPoint(result2.value[0]._latlng);
-                    if (this._mayObstruct(target.subtract(other), marker, result2.value[1])) {
-                        marker._addObstructiveMarker(result2.value[1]);
+                    if (result2.value[1] != marker) {
+                        const other = this._map.latLngToContainerPoint(result2.value[0]._latlng);
+                        if (this._mayObstruct(target.subtract(other), marker, result2.value[1])) {
+                            marker._addObstructiveMarker(result2.value[1]);
+                        }
                     }
                     result2 = iterator2.next();
                 }
                 result = iterator.next();
             }
+        },
+
+        _iterateOnOwnAndOtherGroupsMarkers() {
+            const AllMarkersIterator = L.Class.extend({
+                initialize: function (group) {
+                    this.group = group;
+                    this.done = false;
+                    this.iteratorOnGroups = group._otherGroups.values();
+                    this.iteratorOnMarkers = group._markers.entries();
+                },
+
+                next: function () {
+                    let result = this.iteratorOnMarkers.next();
+                    while (result.done) {
+                        let gr = this.iteratorOnGroups.next();
+                        if (gr.done) {
+                            return { done: true };
+                        } else {
+                            this.iteratorOnMarkers = gr.value._markers.entries();
+                            result = this.iteratorOnMarkers.next();
+                        }
+                    }
+                    return result;
+                },
+            });
+
+            return new AllMarkersIterator(this);
         },
 
         /**
@@ -695,6 +727,23 @@
             }
         },
 
+        makeAwareOfOtherGroup(other) {
+            this._otherGroups.add(other);
+            other._otherGroups.add(this);
+            if (this._map) {
+                this._recomputeObstructions();
+                this.inflateAsManyAsPossible();
+            }
+        },
+
+        removeOtherGroup(other) {
+            this._otherGroups.delete(other);
+            other._otherGroups.delete(this);
+            if (this._map) {
+                this._recomputeObstructions();
+                this.inflateAsManyAsPossible();
+            }
+        },
     });
 
     /**
