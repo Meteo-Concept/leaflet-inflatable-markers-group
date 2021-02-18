@@ -12,6 +12,9 @@ messy. Right-clicking on a marker toggles between the inflated and deflated
 states and when a marker is inflated, all collisioning markers are deflated to
 make room for it.
 
+Have a look at the [demo page](https://meteo-concept.github.io/leaflet-inflatable-markers-group)
+to see what it looks like.
+
 
 Install
 -----
