@@ -1,6 +1,6 @@
 {
   "name": "leaflet-inflatable-markers-group",
-  "version": "1.1.1-alpha",
+  "version": "1.2.0",
   "description": "An alternative to the markers clustering layers",
   "main": "leaflet.inflatable-markers-group.js",
   "scripts": {
