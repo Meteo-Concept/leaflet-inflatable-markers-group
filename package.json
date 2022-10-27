@@ -1,6 +1,6 @@
 {
   "name": "@meteo-concept/leaflet-inflatable-markers-group",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "An alternative to the markers clustering layers",
   "main": "leaflet.inflatable-markers-group.js",
   "scripts": {
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Meteo-Concept/Leaflet.inflatable-markers-group.git"
+    "url": "git+https://github.com/Meteo-Concept/leaflet-inflatable-markers-group.git"
   },
   "keywords": [
     "Leaflet",
@@ -20,7 +20,7 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Meteo-Concept/Leaflet.inflatable-markers-group/issues"
+    "url": "https://github.com/Meteo-Concept/leaflet-inflatable-markers-group/issues"
   },
   "devDependencies": {
     "@babel/cli": "^7.12.16",
@@ -37,5 +37,5 @@
     "example": "example"
   },
   "author": "Météo Concept (https://www.meteo-concept.fr)",
-  "homepage": "https://github.com/Meteo-Concept/Leaflet.inflatable-markers-group#readme"
+  "homepage": "https://github.com/Meteo-Concept/leaflet-inflatable-markers-group#readme"
 }
