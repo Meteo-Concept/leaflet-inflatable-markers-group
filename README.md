@@ -19,9 +19,13 @@ to see what it looks like.
 Install
 -----
 
-Once this plugin stabilizes a little, we'll publish it to the usual channels for
-consumption through npm, yarn, etc. It's just not stable and tested enough for
-now.
+### npm
+
+    npm install @meteo-concept/leaflet-inflatable-markers-layer
+
+### yarn
+
+    yarn add @meteo-concept/leaflet-inflatable-markers-layer
 
 ### Manually
 
@@ -51,19 +55,21 @@ Development
 -----
 
 You can use the example folder for testing.
+The following command produces a minified js and copies leaflet.inflatable-markers-group.min.js in the example folder.
 
 ```
-npm run release   # minify js and copy leaflet.inflatable-markers-group.min.js in example folder
+npm run release 
 ```
 
 
 Changelog
 -----
 
+### 1.0.0
+Initial release, with examples, doc and Typescript typing definitions
+
 ### 0.1.0
 Initial version
-
-
 
 Authors
 -------

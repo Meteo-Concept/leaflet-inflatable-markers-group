@@ -1,5 +1,5 @@
 {
-  "name": "leaflet-inflatable-markers-group",
+  "name": "@meteo-concept/leaflet-inflatable-markers-group",
   "version": "1.2.1",
   "description": "An alternative to the markers clustering layers",
   "main": "leaflet.inflatable-markers-group.js",
@@ -36,5 +36,6 @@
   "directories": {
     "example": "example"
   },
-  "author": "Météo Concept (https://www.meteo-concept.fr)"
+  "author": "Météo Concept (https://www.meteo-concept.fr)",
+  "homepage": "https://github.com/Meteo-Concept/Leaflet.inflatable-markers-group#readme"
 }

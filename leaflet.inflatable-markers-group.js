@@ -630,10 +630,14 @@
          * @inheritdoc
          */
         _refreshIcons: function() {
-            for (const [layer, marker] of this._markers) {
+            const iterator = this._iterateOnOwnAndOtherGroupsMarkers();
+            let result = iterator.next();
+            while (!result.done) {
+                const marker = result.value[1];
                 if (marker._iconNeedsUpdate)
                     marker.redraw();
                 marker._iconNeedsUpdate = false;
+                result = iterator.next();
             }
         },
 
