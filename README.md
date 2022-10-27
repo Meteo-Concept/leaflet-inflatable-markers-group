@@ -65,6 +65,10 @@ npm run release
 Changelog
 -----
 
+### 1.3.0
+First release on npm registry
+Fix the examples
+
 ### 1.0.0
 Initial release, with examples, doc and Typescript typing definitions
 
