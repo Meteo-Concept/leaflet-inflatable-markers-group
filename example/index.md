@@ -7,3 +7,8 @@ Demo
 
 * Demo with two groups: [example2](example2). Similar data but we have
   arbitrarily separated it in two groups, main and secondary.
+
+* Demo with a single group but with a lot of markers and collisions (to assess performance for your use case) :
+  [example3](exemple3). This looks a lot like the first example but with temperature for a specific day
+  in January 2024 from many stations by Météo-France and other providers (source: [MétéoData](https://www.meteodata.fr)).
+  Notice how we leverage the zoom event to hide the deflated icons on lower zooms tofurther improve legibility. 

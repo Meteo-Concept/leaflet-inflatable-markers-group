@@ -64,6 +64,11 @@ npm run release
 
 Changelog
 -----
+### 1.6.0
+- Make the collision computation O(N log(N)) (hopefully) instead of O(N²)
+
+### 1.5.1
+- Make the collision computation asynchronous to improve the responsiveness
 
 ### 1.3.0
 - First release on npm registry

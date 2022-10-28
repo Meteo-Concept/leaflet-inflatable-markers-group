@@ -20,7 +20,7 @@ declare module 'leaflet' {
     interface InflatableMarkersGroupOptions extends L.LayerOptions {
         obstructionSize?: L.Point;
         iconCreateFunction(InflatableMarker): L.DivIcon;
-        groupPane?: L.Marker.prototype.options.pane;
+        groupPane?: string | undefined;
     }
 
     class InflatableMarkersGroup extends L.FeatureGroup {

@@ -60,9 +60,9 @@
          * @constructs L.InflatableMarker
          * @public
          * @param {L.LatLng} latlng - The position of the marker on the map
-         * @param {L.InflatableMarkerGroup} - The group this marker belongs to,
+         * @param {L.InflatableMarkerGroup} group - The group this marker belongs to,
          * marker collisions are only computed inside a single group
-         * @param {L.Layer} - The inflated version of the marker, added to the
+         * @param {L.Layer} baseMarker - The inflated version of the marker, added to the
          * group via addLayer(...)
          */
         initialize: function (latlng, group, baseMarker) {
@@ -86,6 +86,13 @@
              * @type {L.LatLng}
              */
             this._latlng = latlng;
+
+            /**
+             * The clearance box around the marker in the order (north, east, south, west)
+             * @type {[number, number, number, number]}
+             * @private
+             */
+            this._borders = [null, null, null, null];
 
             /**
              * The L.InflatableMarkerGroup this marker belongs to
@@ -127,6 +134,14 @@
             this.addEventParent(this.baseMarker);
 
             this.on("contextmenu", this.toggle, this);
+        },
+
+        _computeBorders: function(map, margin) {
+            const pos = map.latLngToContainerPoint(this._latlng);
+            const halfSize = L.point(this.options._inflatedIcon.options.iconSize).divideBy(2);
+            const br = pos.add(halfSize).add(margin);
+            const ul = pos.subtract(halfSize).subtract(margin);
+            this._borders = [ul.y, br.x, br.y, ul.x];
         },
 
         /**
@@ -546,6 +561,12 @@
             const iterator = this._markers.entries();
             let result = iterator.next();
 
+            const allMarkers = [...this._iterateOnOwnAndOtherGroupsMarkers()];
+            allMarkers.forEach(m => m[1]._computeBorders(this._map, this.options.obstructionSize));
+            allMarkers.sort((m1, m2) => {
+                return m1[1]._borders[0] - m2[1]._borders[0];
+            });
+
             const process = L.bind(async function () {
                 const start = new Date();
 
@@ -555,19 +576,22 @@
                         break;
                     }
                     const marker = result.value[1];
-                    const target = this._map.latLngToContainerPoint(result.value[0]._latlng);
 
-                    const iterator2 = this._iterateOnOwnAndOtherGroupsMarkers();
-                    let result2 = iterator2.next();
-                    while (!result2.done) {
-                        if (result2.value[1] != marker) {
-                            const other = this._map.latLngToContainerPoint(result2.value[0]._latlng);
-                            if (this._mayObstruct(target.subtract(other), marker, result2.value[1])) {
-                                marker._addObstructiveMarker(result2.value[1]);
-                            }
-                        }
-                        result2 = iterator2.next();
-                    }
+                    const posNorth = this._bisectNorth(allMarkers, marker._borders[0]);
+                    const posSouth = this._bisectSouth(allMarkers, marker._borders[2]);
+
+                    const sortedByWest = allMarkers.slice(posNorth, posSouth)
+                            .sort((m1, m2) => {
+                        return m1[1]._borders[3] - m2[1]._borders[3];
+                    });
+                    const posWest = this._bisectWest(sortedByWest, marker._borders[3]);
+                    const posEast = this._bisectEast(sortedByWest, marker._borders[1]);
+
+                    sortedByWest.slice(posWest, posEast).forEach(m => {
+                        if (marker !== m[1])
+                            marker._addObstructiveMarker(m[1]);
+                    })
+
                     result = iterator.next();
                 }
 
@@ -582,31 +606,25 @@
             return process();
         },
 
-        _iterateOnOwnAndOtherGroupsMarkers() {
-            const AllMarkersIterator = L.Class.extend({
-                initialize: function (group) {
-                    this.group = group;
-                    this.done = false;
-                    this.iteratorOnGroups = group._otherGroups.values();
-                    this.iteratorOnMarkers = group._markers.entries();
-                },
+        _iterateOnOwnAndOtherGroupsMarkers: function* () {
+            let iteratorOnGroups = this._otherGroups.values();
+            let iteratorOnMarkers = this._markers.entries();
+            let result = iteratorOnMarkers.next();
+            while (!result.done) {
+                yield result.value;
+                result = iteratorOnMarkers.next();
+            }
 
-                next: function () {
-                    let result = this.iteratorOnMarkers.next();
-                    while (result.done) {
-                        let gr = this.iteratorOnGroups.next();
-                        if (gr.done) {
-                            return { done: true };
-                        } else {
-                            this.iteratorOnMarkers = gr.value._markers.entries();
-                            result = this.iteratorOnMarkers.next();
-                        }
-                    }
-                    return result;
-                },
-            });
-
-            return new AllMarkersIterator(this);
+            let gr = iteratorOnGroups.next();
+            while (!gr.done) {
+                iteratorOnMarkers = gr.value._markers.entries();
+                result = iteratorOnMarkers.next();
+                while (!result.done) {
+                    yield result.value;
+                    result = iteratorOnMarkers.next();
+                }
+                gr = iteratorOnGroups.next();
+            }
         },
 
         /**
@@ -633,7 +651,7 @@
          * React to this group being removed from a map
          *
          * The collision sets are not cleared at this point in case someone
-         * wants to have a look at them but they will be recomputed if the
+         * wants to have a look at them, but they will be recomputed if the
          * group is added again onto a map anyway.
          * @param {L.Map} map - The leaflet map
          * @public
@@ -651,14 +669,10 @@
          * @inheritdoc
          */
         _refreshIcons: function() {
-            const iterator = this._iterateOnOwnAndOtherGroupsMarkers();
-            let result = iterator.next();
-            while (!result.done) {
-                const marker = result.value[1];
+            for (const [baseMarker,marker] of this._iterateOnOwnAndOtherGroupsMarkers()) {
                 if (marker._iconNeedsUpdate)
                     marker.redraw();
                 marker._iconNeedsUpdate = false;
-                result = iterator.next();
             }
         },
 
@@ -764,6 +778,102 @@
                     this.inflateAsManyAsPossible()
                 );
             }
+        },
+
+        /**
+         * Bisect a map of markers to find the last one before the west boundary in parameter
+         * The array has to be sorted.
+         * @param {[L.Marker, L.InflatableMarker][]} markers An array of pairs [Marker, InflatableMarker]
+         * @param {number} x The minimum X boundary
+         * @private
+         */
+        _bisectWest(markers, x) {
+            if (!markers.length)
+                return markers.length;
+            let left = 0;
+            let right = markers.length - 1;
+            let pos = Math.trunc((left + right) / 2);
+            while (pos > left) {
+                if (x > markers[pos][1]._borders[1]) {
+                    left = pos;
+                } else {
+                    right = pos;
+                }
+                pos = Math.trunc((left + right) / 2);
+            }
+            return markers.length > left && x > markers[left][1]._borders[1] ? left + 1 : left;
+        },
+
+        /**
+         * Bisect a map of markers to find the first one past the east boundary in parameter
+         * The array has to be sorted.
+         * @param {[L.Marker, L.InflatableMarker][]} markers An array of pairs [Marker, InflatableMarker]
+         * @param {number} x The minimum X boundary
+         * @private
+         */
+        _bisectEast(markers, x) {
+            if (!markers.length)
+                return -1;
+            let left = 0;
+            let right = markers.length - 1;
+            let pos = Math.ceil((left + right) / 2);
+            while (pos < right) {
+                if (x > markers[pos][1]._borders[3]) {
+                    left = pos;
+                } else {
+                    right = pos;
+                }
+                pos = Math.ceil((left + right) / 2);
+            }
+            return markers.length > right && x < markers[right][1]._borders[3] ? right : right - 1;
+        },
+
+        /**
+         * Bisect a map of markers to find the first one past the east boundary in parameter
+         * The array has to be sorted.
+         * @param {[L.Marker, L.InflatableMarker][]} markers An array of pairs [Marker, InflatableMarker]
+         * @param {number} y The minimum Y boundary
+         * @private
+         */
+        _bisectNorth(markers, y) {
+            if (!markers.length)
+                return markers.length;
+            let left = 0;
+            let right = markers.length - 1;
+            let pos = Math.trunc((left + right) / 2);
+            while (pos > left) {
+                if (y > markers[pos][1]._borders[2]) {
+                    left = pos;
+                } else {
+                    right = pos;
+                }
+                pos = Math.trunc((left + right) / 2);
+            }
+            return y > markers[left][1]._borders[2] ? left : left + 1;
+        },
+
+        /**
+         * Bisect a map of markers to find the first one past the east boundary in parameter
+         * The array has to be sorted.
+         * @param {[L.Marker, L.InflatableMarker][]} markers An array of pairs [Marker, InflatableMarker]
+         * @param {number} y The minimum Y boundary
+         * @private
+         */
+        _bisectSouth(markers, y) {
+            if (!markers.length)
+                return -1;
+            let left = 0;
+            let right = markers.length - 1;
+            let pos = Math.ceil((left + right) / 2);
+            while (pos < right) {
+                if (y > markers[pos][1]._borders[0]) {
+                    left = pos;
+                } else {
+                    right = pos;
+                }
+                pos = Math.ceil((left + right) / 2);
+            }
+            return markers.length > right && y < markers[right][1]._borders[0] ? right : right - 1;
         },
     });
 
