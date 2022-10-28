@@ -1,7 +1,7 @@
 {
   "name": "@meteo-concept/leaflet-inflatable-markers-group",
   "version": "1.3.1",
-  "description": "An alternative to the markers clustering layers",
+  "description": "An alternative to the markers clustering group plugin",
   "main": "leaflet.inflatable-markers-group.js",
   "scripts": {
     "build": "babel --out-file leaflet.inflatable-markers-group.min.js --source-maps --minified --no-comments leaflet.inflatable-markers-group.js",

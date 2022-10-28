@@ -1,4 +1,4 @@
-Leaflet.inflatable-markers-layer
+Leaflet.inflatable-markers-group
 ================================
 
 The plugin can be seen as an alternative to the most excellent [Leaflet marker cluster plugin](https://github.com/Leaflet/Leaflet.markercluster).
@@ -21,15 +21,15 @@ Install
 
 ### npm
 
-    npm install @meteo-concept/leaflet-inflatable-markers-layer
+    npm install @meteo-concept/leaflet-inflatable-markers-group
 
 ### yarn
 
-    yarn add @meteo-concept/leaflet-inflatable-markers-layer
+    yarn add @meteo-concept/leaflet-inflatable-markers-group
 
 ### Manually
 
-Download the [latest release](https://github.com/Meteo-Concept/leaflet-inflatable-markers-layer) and include it in your app.
+Download the [latest release](https://github.com/Meteo-Concept/leaflet-inflatable-markers-group) and include it in your app.
 
 
 Usage
@@ -58,7 +58,7 @@ You can use the example folder for testing.
 The following command produces a minified js and copies leaflet.inflatable-markers-group.min.js in the example folder.
 
 ```
-npm run release 
+npm run release
 ```
 
 
@@ -66,14 +66,14 @@ Changelog
 -----
 
 ### 1.3.0
-First release on npm registry
-Fix the examples
+- First release on npm registry
+- Fix the examples
 
 ### 1.0.0
-Initial release, with examples, doc and Typescript typing definitions
+- Initial release, with examples, doc and Typescript typing definitions
 
 ### 0.1.0
-Initial version
+- Initial version
 
 Authors
 -------
