@@ -23,8 +23,8 @@
     "url": "https://github.com/Meteo-Concept/leaflet-inflatable-markers-group/issues"
   },
   "devDependencies": {
-    "@babel/cli": "^7.12.16",
-    "babel-core": "^6.26.3",
+    "@babel/cli": "^7.12.1",
+    "babel-core": "^4.7.16",
     "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.7.0",
     "live-server": "^1.1.0",
