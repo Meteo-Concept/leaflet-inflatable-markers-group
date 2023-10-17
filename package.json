@@ -1,6 +1,6 @@
 {
   "name": "@meteo-concept/leaflet-inflatable-markers-group",
-  "version": "1.3.2",
+  "version": "1.5.1",
   "description": "An alternative to the markers clustering group plugin",
   "main": "leaflet.inflatable-markers-group.js",
   "scripts": {
