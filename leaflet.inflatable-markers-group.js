@@ -536,30 +536,50 @@
          * Recompute all collision sets for all markers
          * @private
          */
-        _recomputeObstructions: function() {
+        _recomputeObstructions: async function() {
             for (const [l,m] of this._markers) {
                 m._clearObstructiveMarkers();
             }
 
+            const waitFor = delay => new Promise(resolve => setTimeout(resolve, delay));
+
             const iterator = this._markers.entries();
             let result = iterator.next();
-            while (!result.done) {
-                const marker = result.value[1];
-                const target = this._map.latLngToContainerPoint(result.value[0]._latlng);
 
-                const iterator2 = this._iterateOnOwnAndOtherGroupsMarkers();
-                let result2 = iterator2.next();
-                while (!result2.done) {
-                    if (result2.value[1] != marker) {
-                        const other = this._map.latLngToContainerPoint(result2.value[0]._latlng);
-                        if (this._mayObstruct(target.subtract(other), marker, result2.value[1])) {
-                            marker._addObstructiveMarker(result2.value[1]);
-                        }
+            const process = L.bind(async function () {
+                const start = new Date();
+
+                while (!result.done) {
+                    const currentDate = new Date();
+                    if (currentDate - start > 200) {
+                        break;
                     }
-                    result2 = iterator2.next();
+                    const marker = result.value[1];
+                    const target = this._map.latLngToContainerPoint(result.value[0]._latlng);
+
+                    const iterator2 = this._iterateOnOwnAndOtherGroupsMarkers();
+                    let result2 = iterator2.next();
+                    while (!result2.done) {
+                        if (result2.value[1] != marker) {
+                            const other = this._map.latLngToContainerPoint(result2.value[0]._latlng);
+                            if (this._mayObstruct(target.subtract(other), marker, result2.value[1])) {
+                                marker._addObstructiveMarker(result2.value[1]);
+                            }
+                        }
+                        result2 = iterator2.next();
+                    }
+                    result = iterator.next();
                 }
-                result = iterator.next();
-            }
+
+                if (!result.done) {
+                    process();
+                    return waitFor(50).then(process);
+                } else {
+                    return true;
+                }
+            }, this);
+
+            return process();
         },
 
         _iterateOnOwnAndOtherGroupsMarkers() {
@@ -600,12 +620,13 @@
          */
         onAdd: function (map) {
             this._map = map;
-            this._recomputeObstructions();
-            this._featureGroup.addTo(map);
-            if (!this._alreadyDisplayed) {
-                this._alreadyDisplayed = true;
-                this.inflateAsManyAsPossible(true);
-            }
+            this._recomputeObstructions().then(() => {
+                this._featureGroup.addTo(map);
+                if (!this._alreadyDisplayed) {
+                    this._alreadyDisplayed = true;
+                    this.inflateAsManyAsPossible(true);
+                }
+            });
         },
 
         /**
@@ -696,8 +717,9 @@
          * @private
          */
         _zoomend: function() {
-            this._recomputeObstructions();
-            this.inflateAsManyAsPossible();
+            this._recomputeObstructions().then(() =>
+                this.inflateAsManyAsPossible()
+            );
         },
 
         /**
@@ -728,8 +750,9 @@
             this._otherGroups.add(other);
             other._otherGroups.add(this);
             if (this._map) {
-                this._recomputeObstructions();
-                this.inflateAsManyAsPossible();
+                this._recomputeObstructions().then(() =>
+                    this.inflateAsManyAsPossible()
+                );
             }
         },
 
@@ -737,8 +760,9 @@
             this._otherGroups.delete(other);
             other._otherGroups.delete(this);
             if (this._map) {
-                this._recomputeObstructions();
-                this.inflateAsManyAsPossible();
+                this._recomputeObstructions().then(() =>
+                    this.inflateAsManyAsPossible()
+                );
             }
         },
     });
