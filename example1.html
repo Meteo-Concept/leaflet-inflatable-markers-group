@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <title>Leaflet.inflatable-markers-group</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js" charset="utf-8"></script>
-  <script src="leaflet.inflatable-markers-group.min.js" charset="utf-8"></script>
-  <style type='text/css'>
+  <link rel="stylesheet" href="leaflet/dist/leaflet.css">
+  <script src="leaflet/dist/leaflet.js" charset="utf-8"></script>
+  <script src="leaflet.inflatable-markers-group.js" charset="utf-8"></script>
+  <style>
     * {
       box-sizing: border-box;
     }
@@ -72,6 +72,7 @@
     L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
           attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
+
 
     const group = L.inflatableMarkersGroup({
         iconCreateFunction: function (icon) {
