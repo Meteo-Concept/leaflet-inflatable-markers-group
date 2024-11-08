@@ -186,9 +186,11 @@
          * @public
          */
         redraw: function () {
-            // Wierd but convenient; remember that InflatableMarker-s are their
-            // own icons, this is why this works.
-            this.setIcon(this);
+            if (this._inflated) {
+                this.setIcon(this.options._inflatedIcon);
+            } else {
+                this.setIcon(this._group.options.iconCreateFunction(this));
+            }
         },
 
         /**
